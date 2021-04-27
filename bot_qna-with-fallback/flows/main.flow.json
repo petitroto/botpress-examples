@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "catchAll": {
+    "onReceive": [],
+    "next": []
+  },
+  "startNode": "entry",
+  "nodes": [
+    {
+      "id": "entry",
+      "name": "entry",
+      "next": [],
+      "onEnter": [
+        "reply-qna-choices {\"question\":\"{{event.nlu.entities.0.data.value}}\",\"text\":\"以下にご質問はございますか？\",\"placeholder\":\"選択してください\",\"typing\":\"yes\"}"
+      ],
+      "onReceive": null
+    }
+  ]
+}
