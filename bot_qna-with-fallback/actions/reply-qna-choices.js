@@ -6,11 +6,12 @@
    * @category ChatbotToday
    * @author NAKAMURA Masayuki
    * @param {string} [question={{event.nlu.entities.0.data.value}}] - 質問文の検索文字列（デフォルトはエンティティ）
-   * @param {string} [text=以下にご質問はございますか？] - 問いかけ文
+   * @param {string} [text=以下の選択肢に、ご質問に近いものがあればお選びいただけますか。もし無ければ、別の言い方でご質問ください。] - 問いかけ文
    * @param {string} [placeholder=選択してください] - ドロップダウンのプレースホルダー
+   * @param {string} [other=選択肢の中に該当する質問がない] - 該当する質問がない場合の選択肢
    * @param {string} [typing=yes] - タイピング演出の有無
    */
-  const replyQnaChoices = async (question, text, placeholder, typing) => {
+  const replyQnaChoices = async (question, text, placeholder, other, typing) => {
     // QnAモジュールのREST APIを使って、questionを含むQnAを抽出する
     const path = `/mod/qna/questions`
     const axiosConfig = await bp.http.getAxiosConfigForBot(event.botId)
@@ -25,11 +26,12 @@
     if (temp.count_qnas_found === 0) return
 
     // QnAの検索結果からSingleChoice型のコンテント要素を作る
+    const choices = [...questions, other].map(q => {
+      return { title: q, value: q }
+    })
     const contentElement = {
       text,
-      choices: questions.map(q => {
-        return { title: q, value: q }
-      }),
+      choices,
       typing: typing === 'yes',
       isDropdown: true,
       dropdownPlaceholder: placeholder
@@ -46,4 +48,4 @@
     await bp.events.replyToEvent(event, payloads)
   }
 
-  return replyQnaChoices(args.question, args.text, args.placeholder, args.typing)
+  return replyQnaChoices(args.question, args.text, args.placeholder, args.other, args.typing)
